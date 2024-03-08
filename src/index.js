@@ -19,14 +19,15 @@ client.on("ready", (c) => {
   console.log(`Logged in as ${c.user.tag}!`);
 });
 
-// lastly sign in the bot with token
-client.login(process.env.CLIENT_TOKEN);
+client.on("interactionCreate", (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
 
-client.on("messageCreate", (message) => {
-  if (message.author.bot) return;
-  if (message.content === "hello") {
-    message.reply({
-      content: "Hi from Bot!",
-    });
+  if (interaction.commandName === "add") {
+    const num1 = interaction.options.get("first-number").value;
+    const num2 = interaction.options.get("second-number").value;
+    interaction.reply(`The sum is ${num1 + num2}.`);
   }
 });
+
+// lastly sign in the bot with token
+client.login(process.env.TOKEN);
