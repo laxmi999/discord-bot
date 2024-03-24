@@ -2,7 +2,12 @@
 require("dotenv").config();
 
 //import discord.js
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  ActivityType,
+} = require("discord.js");
 
 //create new client
 const client = new Client({
@@ -14,9 +19,33 @@ const client = new Client({
   ],
 });
 
+let status = [
+  {
+    name: "Test1",
+    type: ActivityType.Streaming,
+    url: "https://www.youtube.com/watch?v=-RjM2SZUkao&list=RD-RjM2SZUkao&start_radio=1",
+  },
+  {
+    name: "Test2",
+  },
+  {
+    name: "Test3",
+    type: ActivityType.Watching,
+  },
+  {
+    name: "Test4",
+    type: ActivityType.Listening,
+  },
+];
+
 client.on("ready", (c) => {
   // console.log(client.user);
   console.log(`Logged in as ${c.user.tag}!`);
+
+  // setInterval(() => {
+  //   let random = Math.floor(Math.random() * status.length);
+  //   client.user.setActivity(status[random]);
+  // }, 10000);
 });
 
 // // For slash commands
@@ -66,39 +95,6 @@ client.on("interactionCreate", (interaction) => {
 //     message.channel.send({ embeds: [embed] });
 //   }
 // });
-
-client.on("interactionCreate", async (interaction) => {
-  console.log("inside button function");
-  try {
-    if (!interaction.isButton()) return;
-    // await interaction.deferReply({ ephemeral: true });
-    await interaction.deferReply({ ephemeral: true });
-
-    const role = interaction.guild.roles.cache.get(interaction.customId);
-    if (!role) {
-      interaction.reply({
-        content: "I couldn't find that role.",
-        // ephemeral: true,
-      });
-      return;
-    }
-
-    // Fetch the bot's member in the guild
-    const botMember = await interaction.guild.members.fetch(client.user.id);
-
-    const hasRole = botMember.roles.cache.has(role.id);
-
-    if (hasRole) {
-      await botMember.roles.remove(role);
-      await interaction.editReply(`The role ${role} has been removed.`);
-      return;
-    }
-    await botMember.roles.add(role);
-    await interaction.editReply(`The role ${role} has been added.`);
-  } catch (error) {
-    console.log(error);
-  }
-});
 
 // lastly sign in the bot with token
 client.login(process.env.TOKEN);

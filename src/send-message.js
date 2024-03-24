@@ -60,4 +60,38 @@ client.on("ready", async () => {
   }
 });
 
+client.on("interactionCreate", async (interaction) => {
+  //should be in different file if process.exit() is used
+  console.log("inside button function");
+  try {
+    if (!interaction.isButton()) return;
+    // await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
+
+    const role = interaction.guild.roles.cache.get(interaction.customId);
+    if (!role) {
+      interaction.reply({
+        content: "I couldn't find that role.",
+        // ephemeral: true,
+      });
+      return;
+    }
+
+    // Fetch the bot's member in the guild
+    const botMember = await interaction.guild.members.fetch(client.user.id);
+
+    const hasRole = botMember.roles.cache.has(role.id);
+
+    if (hasRole) {
+      await botMember.roles.remove(role);
+      await interaction.editReply(`The role ${role} has been removed.`);
+      return;
+    }
+    await botMember.roles.add(role);
+    await interaction.editReply(`The role ${role} has been added.`);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 client.login(process.env.TOKEN);
